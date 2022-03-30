@@ -10,16 +10,19 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
+                echo "building docker image"
                 script {
                     app = docker.build("willbla/train-schedule")
                     app.inside {
                         sh 'echo $(curl localhost:8080)'
                     }
                 }
+                echo "build docker image completed, maybe))"                
             }
         }
         stage('Push Docker Image') {
             steps {
+                echo "pushing docker image"                
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_creds') {
                         app.push("${env.BUILD_NUMBER}")
@@ -30,6 +33,7 @@ pipeline {
         }
         stage('DeployToProduction') {
             steps {
+                echo "deploying docker image"
                 input 'Deploy to Production?'
                 milestone(1)
                 withCredentials([usernamePassword(credentialsId: '	prod_server_creds', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
